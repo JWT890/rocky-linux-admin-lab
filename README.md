@@ -15,3 +15,4 @@ NAT for Adapter 1
 Host only for Adapter 2 
 
 After those inputs get Rocky Linux up which will take a few minutes.    
+![Linux](./images/linux.png)    
