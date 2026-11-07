@@ -29,3 +29,25 @@ To verify alice can be reached type su - alice and it will switch to her.
 ![Alice1](./images/alice1.png)  
 What is being checked here is that /etc/passwd stores the password, /etc/shadow hashes the password so passwords can stay here, and /etc/group shows group membership.  
 Delete the alice user and lets move on to file permissions. 
+
+Lets create a folder called /srv/project by typing sudo mkdir -p /srv/project with /srv/ as the parent folder. Then add the devs group by typing sudo groupadd devs, then create a user by running sudo useradd -m -G devs bob with -m creating the user's directory.   
+Then create another user that won't be added to devs called carol, then change the ownership of the folder to the devs by running sudo chown root:devs /srv/project and then permissions with sudo chmod 2770 /srv/project and then run ls -ld /srv/project to verify:  
+![Root](./images/root.png)  
+To test out the permissons run these commands:  
+![Test](./images/test.png)  
+Then another test as well after creating f.txt by typing touch f.txt:   
+![Test1](./images/test1.png)    
+This second test functions by changing permissions to add the ability to write for the owner of the file, which is the non-number form of 640.  
+Then set up by only allowing users to delete their files:   
+sudo mkdir /shared && sudo chmod 1777 /shared which creates the folder and assigns the permissions. 
+sudo -u bob touch /shared/bobfile which gives bob ownership and ability to write to it. 
+Then sudo -u carol rm /shared/bobfile which will deny carol from deleting it.   
+![Deny](./images/deny.png)  
+For setting ACLs run sudo setfacl -m u:carol:rw /srv/project which will grant carol read and write access to the folder.    
+Then run getfacl /srv/project to see the setup and then run sudo -u carol ls /srv/project to verify:    
+![Verify](./images/verify.png)  
+
+To test this run name -l /srvproject/bob.txt to check and show permissions in the directory:    
+![Check](./images/check.png)    
+
+Now lets move on to services by installing httpd with sudo dnf install -y httpd, then enable with sudo systemctl enable --now httpd and then check the status iwth systemctl status httpd and check the enabled status by running systemctl is-enabled httpd, restart with sudo systemctl restart httpd, reload with sudo systemctl reload httpd and stop with sudo systemctl stop httpd.   
