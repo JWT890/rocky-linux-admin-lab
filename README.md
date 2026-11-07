@@ -51,3 +51,27 @@ To test this run name -l /srvproject/bob.txt to check and show permissions in th
 ![Check](./images/check.png)    
 
 Now lets move on to services by installing httpd with sudo dnf install -y httpd, then enable with sudo systemctl enable --now httpd and then check the status iwth systemctl status httpd and check the enabled status by running systemctl is-enabled httpd, restart with sudo systemctl restart httpd, reload with sudo systemctl reload httpd and stop with sudo systemctl stop httpd.   
+Then create a service:  
+![Service](./images/service.png)    
+Then run these commands to reload the daemon and enable hello:  
+![Hello](./images/hello.png)    
+
+Now lets move on to logs with journalctl by running journalctl -u httpd:    
+![Log](./images/log.png)    
+Then run journalctl -p err -b to see errors since boot and journalctl --since "1 hour ago" to see errors from the past hour.    
+Then run journalctl -b -l to see stuff from the previous boot then run journalctl --disk-usage to see disk usage taken up.  
+To make log persist across boots run sudo mkdir -p /var/log/journal && sudo systemctl restart systemd-journald. 
+For a break fix Linux scenario: 
+sudo cp /etc/httpd/conf/httpd.conf /root/httpd.conf.bak 
+sudo sed -i '1i BadDirective on' /etc/httpd/conf/httpd.conf to transform and search for the BadDirective portion.   
+Then run sudo systemctl restart httpd and get the error code:   
+![Error](./images/error.png)    
+Reason for the error is that BadDirective was turned on.    
+Running sudo systemctl status httpd shows that the service has failed in active status. 
+Then run journalctl -xeu httpd to view the error cause: 
+![Error1](./images/error1.png)  
+Running sudo httpd -t confirms it as well:  
+![Confirm](./images/confirm.png)    
+With that out of the way fix by running sudo cp /root/httpd.conf.bak /etc/httpd/conf/httpd.conf and restart httpd.  
+
+Now its time to move on to SSH
