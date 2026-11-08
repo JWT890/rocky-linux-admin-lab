@@ -92,4 +92,5 @@ Then run lsblk to confirm it:
 Then run sudo mkfs.xfs /dev/sdb1 which will create a high performance XFS journaling system for the partition, then run df -h /data to see the space being taken up on the disk.    
 To establish persistance run sudo blkid /dev/sdb1 and save the UUID created, then run echo 'UUID=<paste-uuid>  /data  xfs  defaults  0 0' | sudo tee -a /etc/fstab. Which will save the UUID to xfs and appends it to /etc/fstab, then run sudo systemctl daemon-reload to reload it. Then test by running sudo umount /data && sudo mount -a but if it throws this error:  
 ![Error2](./images/error2.png)  
-Type: sudo sed -i '/\/data/s/[<>]//g' /etc/fstab to strip either < or > from the line, run tail -3 /etc/fstab to confirm, then to test restart the daemon with sudo systemctl daemon-reload, then mount with sudo mount -a and check with df -h /data to verify mount status
+Type: sudo sed -i '/\/data/s/[<>]//g' /etc/fstab to strip either < or > from the line, run tail -3 /etc/fstab to confirm, then to test restart the daemon with sudo systemctl daemon-reload, then mount with sudo mount -a and check with df -h /data to verify mount status.   
+For the second partition lets set up LVM by running sudo pvcreate /dev/sdb2.    
