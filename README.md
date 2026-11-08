@@ -74,4 +74,22 @@ Running sudo httpd -t confirms it as well:
 ![Confirm](./images/confirm.png)    
 With that out of the way fix by running sudo cp /root/httpd.conf.bak /etc/httpd/conf/httpd.conf and restart httpd.  
 
-Now its time to move on to SSH
+Now its time to move on to SSH, harden it by first typing sudo nano /etc/ssh/sshd_config.d/99-hardening.conf and adding in it:  
+PermitRootLogin No  
+PasswordAuthentication No
+AllowUsers No   
+Save it and type sudo sshd -t to validate it and restart sshd by running sudo systemctl restart sshd and then open up another WSL and try to ssh into it:   
+![Validate](./images/validate.png)  
+Then to test port forwarding, in Rocky or WSL run sudo systemctl enable --now cockpit.socket, after running run ssh -L 8080:localhost:80 jon@192.168.56.123 and see a permission denied error but still got in somehow. Then type in a browswer http://localhost:8080 to see it work:   
+![Test2](./images/test2.png)    
+
+Now its time to move on to storage and parition.    
+Start by running lsblk to see the second disk or sdb, then start a plain partition of it by running sudo fdisk /dev/sdb:    
+![Disk](./images/disk.png)  
+Then type n for command, p for primary partition, 1 for partition number, enter for first sector for default staring space, last sector with +2G. Then create a second partition by doing n once again along with p, then choose 2, enter for both first and last sector, type p for partition info review, and then w to save it.  
+Then run lsblk to confirm it:   
+![DIsk1](./images/disk1.png)    
+Then run sudo mkfs.xfs /dev/sdb1 which will create a high performance XFS journaling system for the partition, then run df -h /data to see the space being taken up on the disk.    
+To establish persistance run sudo blkid /dev/sdb1 and save the UUID created, then run echo 'UUID=<paste-uuid>  /data  xfs  defaults  0 0' | sudo tee -a /etc/fstab. Which will save the UUID to xfs and appends it to /etc/fstab, then run sudo systemctl daemon-reload to reload it. Then test by running sudo umount /data && sudo mount -a but if it throws this error:  
+![Error2](./images/error2.png)  
+Type: sudo sed -i '/\/data/s/[<>]//g' /etc/fstab to strip either < or > from the line, run tail -3 /etc/fstab to confirm, then to test restart the daemon with sudo systemctl daemon-reload, then mount with sudo mount -a and check with df -h /data to verify mount status
