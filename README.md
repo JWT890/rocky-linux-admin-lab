@@ -94,3 +94,10 @@ To establish persistance run sudo blkid /dev/sdb1 and save the UUID created, the
 ![Error2](./images/error2.png)  
 Type: sudo sed -i '/\/data/s/[<>]//g' /etc/fstab to strip either < or > from the line, run tail -3 /etc/fstab to confirm, then to test restart the daemon with sudo systemctl daemon-reload, then mount with sudo mount -a and check with df -h /data to verify mount status.   
 For the second partition lets set up LVM by running sudo pvcreate /dev/sdb2.    
+Type sudo pvcreate /dev/sdb2, then sudo vgcreate vg_data /dev/sdb2, then sudo lvcreate -L 1G -n lv_app vg_data, then run sudo mkfs.xfs /dev/vg_data/lv_app. vgcreate makes volume creates, pvcreate creates physical, while lvcreate creates local. 
+Then run sod mkdir /app && sudo mount /dev/vg_data/lv_app /app, then run sudo pvs; sudo vgs; sudo lvs to verify and show:   
+![Group](./images/group.png)    
+To extend it run sudo lvextend -L +1G -r /dev/vg_data/lv_app and then run df -h /app, then reboot and verify that /data is still mounted on sdb1:   
+![Data](./images/data.png)  
+
+Up next is package management with DNF  
